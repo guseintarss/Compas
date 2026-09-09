@@ -1,16 +1,24 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { getServices } from "../api/services";
 
 export default function Services() {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
+  const load = useCallback(() => {
+    setLoading(true);
+    setError(null);
     getServices()
       .then(setServices)
+      .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   return (
     <section>
@@ -20,6 +28,13 @@ export default function Services() {
 
       {loading ? (
         <p className="loading">Загрузка...</p>
+      ) : error ? (
+        <div className="empty">
+          <p>Не удалось загрузить услуги: API недоступен.</p>
+          <button type="button" className="btn small" onClick={load}>
+            Повторить
+          </button>
+        </div>
       ) : (
         <div className="grid">
           {services.map((service) => (
@@ -35,7 +50,7 @@ export default function Services() {
                   </div>
                 ) : (
                   <div className="card-price">
-                    По запросу
+                    Бесплатно
                   </div>
                 )}
                 <button type="button" className="btn card-btn small">

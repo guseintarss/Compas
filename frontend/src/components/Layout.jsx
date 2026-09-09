@@ -1,6 +1,10 @@
 import { NavLink, Link, Outlet } from "react-router-dom";
 
+import { useTheme } from "../hooks/useTheme";
+
 export default function Layout() {
+  const [theme, toggleTheme] = useTheme();
+
   return (
     <>
       <div className="topbar">Бесплатная доставка по всей России от 3 000 ₽</div>
@@ -17,6 +21,14 @@ export default function Layout() {
           </form>
 
           <div className="header-actions">
+            <button
+              className="action theme-toggle"
+              type="button"
+              onClick={toggleTheme}
+              title={theme === "light" ? "Включить тёмную тему" : "Включить светлую тему"}
+            >
+              {theme === "light" ? "☀️" : "🌙"}
+            </button>
             <a className="action" href="mailto:example@example.com" title="Контакты">
               <span className="icon">✆</span>
               Связаться

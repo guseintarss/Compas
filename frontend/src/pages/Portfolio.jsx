@@ -1,16 +1,24 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { getPortfolio } from "../api/portfolio";
 
 export default function Portfolio() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
+  const load = useCallback(() => {
+    setLoading(true);
+    setError(null);
     getPortfolio()
       .then(setProjects)
+      .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   return (
     <section>
@@ -25,6 +33,14 @@ export default function Portfolio() {
 
       {loading ? (
         <p className="loading">Загрузка каталога...</p>
+      ) : error ? (
+        <div className="empty">
+          <p>Не удалось загрузить товары: API недоступен.</p>
+          <p className="card-desc">Убедитесь, что backend запущен на порту 8000, затем повторите запрос.</p>
+          <button type="button" className="btn small" onClick={load}>
+            Повторить
+          </button>
+        </div>
       ) : (
         <div className="grid">
           {projects.map((project) => (
